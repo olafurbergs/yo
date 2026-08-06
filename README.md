@@ -51,7 +51,7 @@ of hammering the same request over and over.
 ## Installation
 
 ```
-go install github.com/olafurbergs/yo
+go install github.com/olafurbergs/yo@latest
 ```
 
 ## Usage
