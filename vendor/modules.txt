@@ -1,10 +1,22 @@
-# golang.org/x/net v0.0.0-20181017193950-04a2e542c03f
-golang.org/x/net/http2
+# github.com/brianvoe/gofakeit/v6 v6.28.0
+## explicit; go 1.21
+github.com/brianvoe/gofakeit/v6
+github.com/brianvoe/gofakeit/v6/data
+# github.com/rakyll/hey v0.1.4
+## explicit; go 1.13
+github.com/rakyll/hey/requester
+# golang.org/x/net v0.0.0-20191009170851-d66e71096ffb
+## explicit; go 1.11
 golang.org/x/net/http/httpguts
+golang.org/x/net/http2
 golang.org/x/net/http2/hpack
 golang.org/x/net/idna
-# golang.org/x/text v0.3.0
+# golang.org/x/text v0.3.2
+## explicit
 golang.org/x/text/secure/bidirule
+golang.org/x/text/transform
 golang.org/x/text/unicode/bidi
 golang.org/x/text/unicode/norm
-golang.org/x/text/transform
+# gopkg.in/yaml.v3 v3.0.1
+## explicit
+gopkg.in/yaml.v3

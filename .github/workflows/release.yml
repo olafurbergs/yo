@@ -1,0 +1,87 @@
+name: release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+      - name: Build
+        run: go build ./...
+      - name: Vet
+        run: go vet ./...
+      - name: Test
+        run: go test ./...
+
+  build:
+    name: Build (${{ matrix.os }}/${{ matrix.arch }})
+    needs: test
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: linux
+            arch: amd64
+          - os: linux
+            arch: arm64
+          - os: darwin
+            arch: amd64
+          - os: darwin
+            arch: arm64
+          - os: windows
+            arch: amd64
+          - os: windows
+            arch: arm64
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+      - name: Build binary
+        run: |
+          mkdir -p dist
+          CGO_ENABLED=0 GOOS=${{ matrix.os }} GOARCH=${{ matrix.arch }} \
+            go build -trimpath -o dist/yo_${{ matrix.os }}_${{ matrix.arch }}${{ matrix.os == 'windows' && '.exe' || '' }} .
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: yo_${{ matrix.os }}_${{ matrix.arch }}
+          path: dist/yo_${{ matrix.os }}_${{ matrix.arch }}*
+
+  release:
+    name: Release
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+      - name: Generate checksums
+        run: |
+          cd dist
+          sha256sum yo_* > checksums.txt
+          cat checksums.txt
+      - name: Publish release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/yo_*
+          fail_on_unmatched_files: true
+          generate_release_notes: true
+          name: ${{ github.ref_name }}
+          draft: ${{ !startsWith(github.ref, 'refs/tags/') }}
