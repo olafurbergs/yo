@@ -1,0 +1,7 @@
+POST /api/users HTTP/1.1
+Host: {{.String}}.example.com
+X-Request-Id: {{.RequestID}}
+X-User: {{var "username"}}
+Content-Type: application/json
+
+{"email": "{{.Email}}", "name": "{{name}}", "age": {{randInt 18 90}}, "city": "{{var "city"}}"}
