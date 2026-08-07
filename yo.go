@@ -43,8 +43,14 @@ import (
 const (
 	headerRegexp = `^([\w-]+):\s*(.+)`
 	authRegexp   = `^(.+):([^\s].+)`
-	heyUA        = "hey/0.0.1"
 )
+
+// version is stamped at build time with
+// -ldflags "-X main.version=v0.1.0" and defaults to "dev".
+var version = "dev"
+
+// defaultUA is appended to every request's User-Agent header.
+var defaultUA = "yo/" + version
 
 var (
 	m            = flag.String("m", "GET", "")
@@ -114,7 +120,7 @@ Options:
       array on each request. For example, /home/user/values.json or
       ./values.yaml
   -T  Content-type, defaults to "text/html".
-  -U  User-Agent, defaults to version "yo/0.0.1".
+  -U  User-Agent, defaults to "%s".
   -a  Basic authentication, username:password.
   -x  HTTP Proxy address as host:port.
   -h2 Enable HTTP/2.
@@ -160,7 +166,7 @@ Templates:
 
 func main() {
 	flag.Usage = func() {
-		fmt.Fprint(os.Stderr, fmt.Sprintf(usage, runtime.NumCPU()))
+		fmt.Fprint(os.Stderr, fmt.Sprintf(usage, defaultUA, runtime.NumCPU()))
 	}
 
 	var hs headerSlice
@@ -344,15 +350,15 @@ func main() {
 
 	ua := header.Get("User-Agent")
 	if ua == "" {
-		ua = heyUA
+		ua = defaultUA
 	} else {
-		ua += " " + heyUA
+		ua += " " + defaultUA
 	}
 	header.Set("User-Agent", ua)
 
 	// set userAgent header if set
 	if *userAgent != "" {
-		ua = *userAgent + " " + heyUA
+		ua = *userAgent + " " + defaultUA
 		header.Set("User-Agent", ua)
 	}
 
